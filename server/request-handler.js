@@ -11,6 +11,8 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
+var tempStorage = [];
+
 
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
@@ -27,19 +29,35 @@ var requestHandler = function(request, response) {
   // Adding more logging to your server can be an easy way to get passive
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
+  var statusCode;
+  // what other params can we get from 'request'?
+  if (request.url === "/classes/room1") { //messages
+    //statusCode = 200;
+    if (request.method === 'GET') {
+      statusCode = 200;
+    } else {
+    //if (request.method === 'POST')
+      statusCode = 201;
+    }
+  } else {
+    statusCode = 404;
+  }
+
   console.log("Serving request type " + request.method + " for url " + request.url);
+  // TODO: handle multiple URLs;
 
   // The outgoing status.
-  var statusCode = 200;
 
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
+  
 
   // Tell the client we are sending them plain text.
   //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
-  headers['Content-Type'] = "text/plain";
+  // headers['Content-Type'] = "text/plain"; 'application/json';
+  headers['Content-Type'] = "application/json"
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
@@ -52,7 +70,17 @@ var requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  response.end("Hello, World!");
+  // var messages = [request._postData];
+  if (statusCode === 200) { // GET
+    response.end(JSON.stringify({results: tempStorage}));
+  } else if (statusCode === 201){ // POST
+    // add msg to results
+    tempStorage.push(request._postData);
+
+    response.end();
+  }else {
+    response.end("404");
+  }
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
@@ -71,3 +99,5 @@ var defaultCorsHeaders = {
   "access-control-max-age": 10 // Seconds.
 };
 
+module.exports.requestHandler = requestHandler;
+module.exports.defaultCorsHeaders = defaultCorsHeaders;

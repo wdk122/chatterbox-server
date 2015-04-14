@@ -56,8 +56,8 @@ describe('Node Server Request Listener Function', function() {
     expect(parsedBody.results).to.be.an('array');
     expect(res._ended).to.equal(true);
   });
-
-  it('Should accept posts to /classes/room', function() {
+// getting the next test to pass helps us pass step 3
+  it('Should accept posts to /classes/room1', function() {
     var stubMsg = {
       username: 'Jono',
       message: 'Do my bidding!'
@@ -96,6 +96,7 @@ it('Should respond with messages that were previously posted', function() {
 
     expect(res._responseCode).to.equal(200);
     var messages = JSON.parse(res._data).results;
+    console.log(messages);
     expect(messages.length).to.be.above(0);
     expect(messages[0].username).to.equal('Jono');
     expect(messages[0].message).to.equal('Do my bidding!');
